@@ -388,7 +388,6 @@ char* find_out_image_name()
 	strcat(file_name, ".raw");
 
 	ret = PyObject_CallObject(func, Py_BuildValue("(z)", file_name));
-
 	PyObject* objectsRepresentation = PyObject_Repr(ret); // 객체를 문자열로 표현한다.
 	PyObject* str = PyUnicode_AsEncodedString(objectsRepresentation, "utf-8", "~E~"); // 객체를 인코딩한다.
 	result = PyBytes_AsString(str); // string으로 변환하여 준다.
