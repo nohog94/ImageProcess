@@ -1,0 +1,48 @@
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.applications import imagenet_utils
+from tensorflow.keras.models import load_model
+
+def Multiply(x):
+    mobile = tf.keras.applications.mobilenet.MobileNet()
+    #mobile = load_model('mobilenet.h5', compile=False)
+    scene_infile = open(x, "rb")
+    scene_image_array = np.fromfile(scene_infile, dtype=np.uint8)
+    temp = np.array([])
+    for i in scene_image_array:
+        temp = np.append(temp, i)
+        temp = np.append(temp, i)
+        temp = np.append(temp, i)
+
+    temp1 = np.expand_dims(np.resize(temp, (224, 224, 3)), axis=0)
+    temp2 = tf.keras.applications.mobilenet.preprocess_input(temp1)
+    predictions = mobile.predict(temp2)
+    results = imagenet_utils.decode_predictions(predictions)
+    # print(results[0][0][1])
+    return results[0][0][1]
+
+# def do_predict():
+#     mobile = tf.keras.applications.mobilenet.MobileNet()
+#     mobile = load_model('mobilenet.h5', compile=False)
+#     scene_infile = open("random.raw", "rb")
+#     scene_image_array = np.fromfile(scene_infile, dtype=np.uint8)
+#     temp = np.array([])
+#     for i in scene_image_array:
+#         temp = np.append(temp, i)
+#         temp = np.append(temp, i)
+#         temp = np.append(temp, i)
+
+#     temp1 = np.expand_dims(np.resize(temp, (224, 224, 3)), axis=0)
+#     temp2 = tf.keras.applications.mobilenet.preprocess_input(temp1)
+#     predictions = mobile.predict(temp2)
+#     results = imagenet_utils.decode_predictions(predictions)
+#     return results[0][0][1]
+# #print(f'This is {results[0][0][1]}')
+
+# def PrintMyDef():
+#  print "Hello, MyDef!"
+
+
+# def print_Hello():
+#     print("Hello~")
+

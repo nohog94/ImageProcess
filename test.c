@@ -22,7 +22,7 @@ void up_down_change(); void move_image(int, int); void rotate(int); void zoom_in
 void openImage();
 void equal_image();
 void saveOutputImage(char, char);
-void find_out_image_name();
+char* find_out_image_name();
 
 /////// 전역변수 선언부
 unsigned char** inImage = NULL, ** outImage = NULL;
@@ -283,11 +283,12 @@ void saveOutputImage(char action2, char action3)
 {
 	char file_path[100] = "C:\\images\\RAW\\saved_image\\";
 	char tmpname[50];
-	if (!strcmp(file_name, "random"))
+	char autosave;
+	printf("이미지 인식 기능을 사용하시겠습니까? y/n \n");
+	scanf(" %c", &autosave);
+	if (autosave == 'y')
 	{
-		find_out_image_name();
-		printf("저장할 파일명 입력\n");
-		scanf(" %s", tmpname);
+		strcpy(tmpname, find_out_image_name());		
 		strcat(file_path, tmpname);
 	}
 	else
@@ -371,15 +372,30 @@ void saveOutputImage(char action2, char action3)
 	fclose(wfp);
 }
 
-void find_out_image_name()
+char* find_out_image_name()
 {
-	char filename[] = "imagename.py";
-	FILE* fp;
-
+	PyObject* module;
+	PyObject* func;
+	PyObject* ret;
+	int i_ret;
+	char* result;
 	Py_Initialize();
-	fp = _Py_fopen(filename, "r");
-	PyRun_SimpleFile(fp, filename);
+	PyRun_SimpleString("import sys");
+	PyRun_SimpleString("sys.path.append(r'C:\\Users\\kccistc\\source\\repos\\Mission007\\Mission007')");
+	module = PyImport_ImportModule("imagename");
+	func = PyObject_GetAttrString(module, "guess_image");
+
+	strcat(file_name, ".raw");
+
+	ret = PyObject_CallObject(func, Py_BuildValue("(z)", file_name));
+
+	PyObject* objectsRepresentation = PyObject_Repr(ret); // 객체를 문자열로 표현한다.
+	PyObject* str = PyUnicode_AsEncodedString(objectsRepresentation, "utf-8", "~E~"); // 객체를 인코딩한다.
+	result = PyBytes_AsString(str); // string으로 변환하여 준다.
+	Py_DECREF(ret);
 	Py_Finalize();
+	result = strtok(result, "'");
+	return result;
 }
 
 ////// 영상처리 함수 정의부
